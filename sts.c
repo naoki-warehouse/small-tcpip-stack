@@ -4,7 +4,7 @@
 #include "file.h"
 
 const char* sts_dir = "/tmp/sts/";
-const char* config_sock = "/tmp/sts/config_sock";
+const char* sock = "/tmp/sts/sock";
 
 int main(int argc, char* argv[]){
 
@@ -19,15 +19,14 @@ int main(int argc, char* argv[]){
         fprintf(stdout, "STS dir %s exists\n", sts_dir);
     }
 
-    if(!file_exist(config_sock)){
-        fprintf(stdout, "Config Socket %s does not exist. Creating...\n", config_sock);
-        if(!file_create_file(config_sock)){
-            fprintf(stderr, "Failed to create Config Socket %s\n", config_sock);
+    if(file_exist(sock)){
+        fprintf(stdout, "Socket %s exists. Deleting...\n", sock);
+        if(file_delete_file(sock)){
+            fprintf(stdout, "Delete Socket %s\n", sock);
+        }else{
+            fprintf(stderr, "Fialed to delete Socket %s\n", sock);
             return 1;
         }
-        fprintf(stdout, "Create Config Socket %s\n", config_sock);
-    }else{
-        fprintf(stdout, "Config Socket %s exists\n", config_sock);
     }
 
     return 0;
