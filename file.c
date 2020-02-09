@@ -27,7 +27,6 @@ bool file_create_file(const char* file_name){
     return true;
 }
 
-
 bool file_delete_file(const char* file_name){
     if(remove(file_name) == 0){
         return true;
