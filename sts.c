@@ -10,9 +10,9 @@
 #include "dev_tap.h"
 #include "netdev.h"
 #include "utils.h"
+#include "config.h"
 
 const char* sts_dir = "/tmp/sts/";
-const char* sock = "/tmp/sts/sock";
 
 int main(int argc, char* argv[]){
 
@@ -27,17 +27,17 @@ int main(int argc, char* argv[]){
         fprintf(stdout, "STS dir %s exists\n", sts_dir);
     }
 
-    if(file_exist(sock)){
-        fprintf(stdout, "Socket %s exists. Deleting...\n", sock);
-        if(file_delete_file(sock)){
-            fprintf(stdout, "Delete Socket %s\n", sock);
+    if(file_exist(sts_sock)){
+        fprintf(stdout, "Socket %s exists. Deleting...\n", sts_sock);
+        if(file_delete_file(sts_sock)){
+            fprintf(stdout, "Delete Socket %s\n", sts_sock);
         }else{
-            fprintf(stderr, "Fialed to delete Socket %s\n", sock);
+            fprintf(stderr, "Fialed to delete Socket %s\n", sts_sock);
             return -1;
         }
     }
 
-    int fd = unix_sock_open_server(sock);
+    int fd = unix_sock_open_server(sts_sock);
 
     int tap_fd = dev_tap_open("test");
     /*
@@ -90,10 +90,10 @@ int main(int argc, char* argv[]){
         sleep(1);
     }
 
-    if(file_delete_file(sock)){
-        fprintf(stdout, "Delete Socket %s\n", sock);
+    if(file_delete_file(sts_sock)){
+        fprintf(stdout, "Delete Socket %s\n", sts_sock);
     }else{
-        fprintf(stderr, "Fialed to delete Socket %s\n", sock);
+        fprintf(stderr, "Fialed to delete Socket %s\n", sts_sock);
         return -1;
     }
     return 0;
