@@ -8,6 +8,7 @@
 #include "file.h"
 #include "unix_sock.h"
 #include "dev_tap.h"
+#include "utils.h"
 
 const char* sts_dir = "/tmp/sts/";
 const char* sock = "/tmp/sts/sock";
@@ -54,6 +55,7 @@ int main(int argc, char* argv[]){
     recv(fd_accept, buf, sizeof(buf), 0);
     printf("RECV:%s\n", buf);
     */
+    run_cmd("ip a add 192.168.100.100/24 dev test");
 
     while(1){
         sleep(1);
