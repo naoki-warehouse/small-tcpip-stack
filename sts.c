@@ -3,9 +3,11 @@
 #include <stdbool.h>
 #include <sys/un.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "file.h"
 #include "unix_sock.h"
+#include "dev_tap.h"
 
 const char* sts_dir = "/tmp/sts/";
 const char* sock = "/tmp/sts/sock";
@@ -35,6 +37,8 @@ int main(int argc, char* argv[]){
 
     int fd = unix_sock_open_server(sock);
 
+    int tap_fd = dev_tap_open("test");
+    /*
     struct sockaddr_un sun;
     int sock_len = 0;
     int fd_accept = accept(fd, (struct sockaddr *)&sun, &sock_len);
@@ -49,6 +53,11 @@ int main(int argc, char* argv[]){
 
     recv(fd_accept, buf, sizeof(buf), 0);
     printf("RECV:%s\n", buf);
+    */
+
+    while(1){
+        sleep(1);
+    }
 
     if(file_delete_file(sock)){
         fprintf(stdout, "Delete Socket %s\n", sock);
