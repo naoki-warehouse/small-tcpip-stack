@@ -15,8 +15,8 @@ struct netdev_info *netdev_add(uint8_t *hw_addr, uint8_t* ip_addr, int mtu){
             netdev_pre = netdev_tail;
             netdev_tail = netdev_tail->next;
         }
-        netdev_pre->next = malloc(sizeof(struct netdev_info));
-        netdev_tail = netdev_pre->next;
+        netdev_tail->next = malloc(sizeof(struct netdev_info));
+        netdev_tail = netdev_tail->next;
     }else{
         netdev_head = malloc(sizeof(struct netdev_info));
         netdev_tail = netdev_head;

@@ -2,10 +2,16 @@
 #define _SOCKET_MANAGER_H_
 
 int socket_manager_init();
-int socket_manager_listen_thread();
-int socket_manager_rx_thread();
+void* socket_manager_listen_thread(void *arg);
+void* socket_manager_rx_thread(void *arg);
 int socket_manager_tx_thread();
-int socket_manager_create_raw_socket();
+
+struct socket_entry* socket_manager_create_raw_socket(int fd);
+int socket_manager_delete_raw_socket(int fd);
+struct socket_entry* socket_manager_get_raw_socket(int fd);
+void socket_manager_list_raw_socket();
+
+
 int socket_manager_add_raw_packet();
 int socket_manager_get_raw_packet();
 

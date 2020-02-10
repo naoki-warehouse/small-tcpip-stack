@@ -1,13 +1,13 @@
-#include "unix_sock.h"
 #include <sys/socket.h>
-#include <string.h>
+#include <unistd.h>
+#include "my_sock.h"
 
-const char* sock = "/tmp/sts/sock";
+
 int main(int argc, char *argv[]){
-    int fd = unix_sock_open_client(sock);
-
-    const char* test_str = "Hello World";
-    send(fd, test_str, strlen(test_str), 0);
+    int fd = my_sock_socket(AF_INET, SOCK_RAW, 0);
+    while(1){
+        sleep(1);
+    }
 
     return 0;
 }

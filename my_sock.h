@@ -25,15 +25,18 @@ ssize_t my_sock_sendmsg();
 #define MY_SOCK_PKT_RES_OK (0)
 #define MY_SOCK_PKT_RES_ERROR (1)
 
-struct my_sock_pkt_socket_req {
+struct my_sock_pkt_header {
     uint8_t pkt_type;
     uint8_t op;
+};
+
+struct my_sock_pkt_socket_req {
+    struct my_sock_pkt_header hdr;
     uint8_t sock_type;
 };
 
 struct my_sock_pkt_socket_res {
-    uint8_t pkt_type;
-    uint8_t op;
+    struct my_sock_pkt_header hdr;
     uint8_t res;
 };
 

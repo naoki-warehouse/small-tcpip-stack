@@ -4,6 +4,7 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "file.h"
 #include "unix_sock.h"
@@ -11,10 +12,12 @@
 #include "netdev.h"
 #include "utils.h"
 #include "config.h"
+#include "socket_manager.h"
 
 const char* sts_dir = "/tmp/sts/";
 
 int main(int argc, char* argv[]){
+    signal(SIGPIPE, SIG_IGN);
 
     if(!file_exist(sts_dir)){
         fprintf(stdout, "STS dir %s does not exist. Creating...\n", sts_dir);
@@ -37,10 +40,10 @@ int main(int argc, char* argv[]){
         }
     }
 
-    int fd = unix_sock_open_server(sts_sock);
 
     int tap_fd = dev_tap_open("test");
     /*
+    int fd = unix_sock_open_server(sts_sock);
     struct sockaddr_un sun;
     int sock_len = 0;
     int fd_accept = accept(fd, (struct sockaddr *)&sun, &sock_len);
@@ -61,6 +64,7 @@ int main(int argc, char* argv[]){
     netdev_add(hw, ip, 1500);
     hw[5] = 0x1e;
     ip[3] = 2;
+    netdev_add(hw, ip, 1500);
     netdev_add(hw, ip, 1500);
     netdev_list();
     struct netdev_info *netdev = netdev_get_by_ip(ip);
@@ -86,7 +90,10 @@ int main(int argc, char* argv[]){
     }
     run_cmd("ip a add 192.168.100.100/24 dev test");
 
+    socket_manager_init();
+
     while(1){
+        socket_manager_list_raw_socket();
         sleep(1);
     }
 

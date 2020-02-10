@@ -14,21 +14,24 @@ int my_sock_socket(int domain, int type, int protocol){
     if(sts_fd == -1) return -1;
 
     struct my_sock_pkt_socket_req pkt_req;
-    pkt_req.pkt_type = MY_SOCK_PKT_SOCKET;
-    pkt_req.op = MY_SOCK_PKT_OP_REQ;
+    pkt_req.hdr.pkt_type = MY_SOCK_PKT_SOCKET;
+    pkt_req.hdr.op = MY_SOCK_PKT_OP_REQ;
 
     switch(type){
-        SOCK_RAW:
-            pkt_req.sock_type = MY_SOCK_PKT_RECV;
+        case SOCK_RAW:
+            pkt_req.sock_type = MY_SOCK_PKT_TYPE_RAW;
             break;
+        default:
+            fprintf(stderr, "Not defined type:%d\n", type);
+            return -1;
     }
     send(sts_fd, &pkt_req, sizeof(pkt_req), 0);
 
     struct my_sock_pkt_socket_res pkt_res;
     int recv_size = recv(sts_fd, &pkt_res, sizeof(pkt_res), 0);
 
-    if(pkt_res.pkt_type != MY_SOCK_PKT_SOCKET) goto err;
-    if(pkt_res.op != MY_SOCK_PKT_OP_RES) goto err;
+    if(pkt_res.hdr.pkt_type != MY_SOCK_PKT_SOCKET) goto err;
+    if(pkt_res.hdr.op != MY_SOCK_PKT_OP_RES) goto err;
     if(pkt_res.res != MY_SOCK_PKT_RES_OK) goto err;
 
     return sts_fd;
