@@ -70,7 +70,6 @@ void* socket_manager_rx_thread(void *arg){
         if(size < 1){
             goto err;
         }
-        printf("\n");
 
         struct my_sock_pkt_header *hdr = (struct my_sock_pkt_header *)recv_buf;
 
@@ -182,8 +181,21 @@ void socket_manager_list_raw_socket(){
     }
 }
 
-int socket_manager_add_raw_packet(){
+int socket_manager_add_raw_packet(const uint8_t *buf, int len){
+    struct my_sock_pkt_data data;
+    if(len > CONFIG_SOCKET_MANAGER_BUF_SIZE){
+        fprintf(stderr, "Too large packet size:%d\n", len);
+        return -1;
+    }
+    data.pkt_type = MY_SOCK_PKT_DATA;
+    data.size = len;
+    memcpy(data.data, buf, len);
 
+    struct socket_entry *entry = socket_list_raw;
+    while(entry != NULL){
+        send(entry->fd, &data, sizeof(data)-CONFIG_SOCKET_MANAGER_BUF_SIZE+data.size, 0);
+        entry = entry->next;
+    }
 }
 
 int socket_manager_get_raw_packet(){

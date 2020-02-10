@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <sys/socket.h>
+#include <string.h>
 
 #include "my_sock.h"
 #include "unix_sock.h"
@@ -42,5 +43,13 @@ err:
 }
 
 ssize_t my_sock_recv(int sockfd, void *buf, size_t len, int flags){
+    struct my_sock_pkt_data data;
+    int size = recv(sockfd, &data, sizeof(data), 0);
 
+    if(size < 1) return -1;
+    if(data.pkt_type != MY_SOCK_PKT_DATA) return -1;
+    if(data.size > len) return -1;
+
+    memcpy(buf, data.data, data.size);
+    return data.size;
 }

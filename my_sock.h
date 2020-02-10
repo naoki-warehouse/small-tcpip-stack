@@ -2,6 +2,7 @@
 #define _MY_SOCK_H_
 
 #include <stdint.h>
+#include "config.h"
 
 int my_sock_socket(int domain, int type, int protocol);
 
@@ -15,7 +16,7 @@ ssize_t my_sock_sendmsg();
 
 
 #define MY_SOCK_PKT_SOCKET (0)
-#define MY_SOCK_PKT_RECV (1)
+#define MY_SOCK_PKT_DATA (1)
 
 #define MY_SOCK_PKT_OP_REQ (0)
 #define MY_SOCK_PKT_OP_RES (1)
@@ -38,6 +39,12 @@ struct my_sock_pkt_socket_req {
 struct my_sock_pkt_socket_res {
     struct my_sock_pkt_header hdr;
     uint8_t res;
+};
+
+struct my_sock_pkt_data {
+    uint8_t pkt_type;
+    uint32_t size;
+    uint8_t data[CONFIG_SOCKET_MANAGER_BUF_SIZE];
 };
 
 #endif

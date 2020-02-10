@@ -94,6 +94,8 @@ int main(int argc, char* argv[]){
 
     while(1){
         socket_manager_list_raw_socket();
+        const char* str = "Hello World";
+        socket_manager_add_raw_packet(str, strlen(str));
         sleep(1);
     }
 
