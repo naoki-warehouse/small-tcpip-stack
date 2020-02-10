@@ -91,11 +91,12 @@ int main(int argc, char* argv[]){
     run_cmd("ip a add 192.168.100.100/24 dev test");
 
     socket_manager_init();
+    netdev_init("tap_sts");
 
     while(1){
         socket_manager_list_raw_socket();
-        const char* str = "Hello World";
-        socket_manager_add_raw_packet(str, strlen(str));
+        //const char* str = "Hello World";
+        //socket_manager_add_raw_packet(str, strlen(str));
         sleep(1);
     }
 

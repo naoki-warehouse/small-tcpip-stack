@@ -13,6 +13,10 @@ int main(int argc, char *argv[]){
     while(1){
         memset(buf, 0, sizeof(buf));
         int size = my_sock_recv(fd, buf, sizeof(buf), 0);
+        if(size < 1){
+            fprintf(stderr, "Failed to recv\n");
+            continue;
+        }
         for(int i=0;i<size;i++){
             printf("%02X ", buf[i]);
         }

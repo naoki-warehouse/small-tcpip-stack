@@ -1,9 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <pthread.h>
 
 #include "netdev.h"
+#include "dev_tap.h"
+#include "socket_manager.h"
+#include "config.h"
+#include "utils.h"
+
 struct netdev_info *netdev_head = NULL;
+
+static pthread_t rx_thread;
+
+int netdev_init(const char* dev_name){
+    int tap_fd = dev_tap_open(dev_name);
+    if(tap_fd == -1){
+        fprintf(stderr, "Failed to init netdev\n");
+        return -1;
+    }
+    pthread_create(&rx_thread, NULL, netdev_rx_thread, &tap_fd);
+
+    run_cmd("ip a add 192.168.100.100/24 dev %s", dev_name);
+    run_cmd("ip link set dev %s up", dev_name);
+
+    return 0;
+}
+
+void *netdev_rx_thread(void *arg){
+    int fd = *((int *)arg);
+    uint8_t buf[CONFIG_SOCKET_MANAGER_BUF_SIZE];
+    fprintf(stdout, "Starting to recv netdev...\n");
+    while(1){
+        int size = dev_tap_read(fd, buf, sizeof(buf));
+        printf("Recv netdev size:%d\n", size);
+        socket_manager_add_raw_packet(buf, size);
+    }
+}
 
 struct netdev_info *netdev_add(uint8_t *hw_addr, uint8_t* ip_addr, int mtu){
     struct netdev_info *netdev_tail = netdev_head;
