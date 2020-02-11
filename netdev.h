@@ -18,6 +18,7 @@ void* netdev_rx_thread(void *arg);
 int netdev_tx(void *buf);
 
 struct netdev_info* netdev_add(uint8_t* hw_addr, uint8_t* ip_addr, int mtu);
+struct netdev_info* netdev_add_s(const char* hw_addr, const char* ip_addr, int mtu);
 
 struct netdev_info* netdev_get_by_ip(uint8_t* ip_addr);
 struct netdev_info* netdev_get_by_hw(uint8_t* hw_addr);

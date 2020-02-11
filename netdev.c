@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <arpa/inet.h>
 
 #include "netdev.h"
 #include "dev_tap.h"
@@ -83,6 +84,19 @@ struct netdev_info *netdev_add(uint8_t *hw_addr, uint8_t* ip_addr, int mtu){
     netdev_tail->next = NULL;
 
     return netdev_tail;
+}
+
+struct netdev_info* netdev_add_s(const char* hw_addr, const char* ip_addr, int mtu){
+    uint8_t hw[6];
+    uint8_t ip[4];
+    sscanf(hw_addr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", 
+            &hw[0], &hw[1], &hw[2], &hw[3], &hw[4], &hw[5]);
+    uint32_t ip_t = inet_addr(ip_addr);
+    ip[0] = ip_t&0xFF;
+    ip[1] = (ip_t>>8)&0xFF;
+    ip[2] = (ip_t>>16)&0xFF;
+    ip[3] = (ip_t>>24)&0xFF;
+    return netdev_add(hw, ip, mtu);
 }
 
 void netdev_list(){

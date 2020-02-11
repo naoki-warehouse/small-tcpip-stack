@@ -59,9 +59,8 @@ int main(int argc, char* argv[]){
     recv(fd_accept, buf, sizeof(buf), 0);
     printf("RECV:%s\n", buf);
     */
-    uint8_t hw[6] = {0x98, 0xfa, 0x9b, 0x4c, 0x09 ,0x1d};
-    uint8_t ip[4] = {192, 168, 100, 1};
-    netdev_add(hw, ip, 1500);
+    netdev_add_s("98:FA:9B:4C:09:1D", "192.168.100.1", 1500);
+    netdev_add_s("98:FA:9B:4C:09:1E", "192.168.100.2", 1500);
     netdev_list();
     //hw[5] = 0x1e;
     //ip[3] = 2;
