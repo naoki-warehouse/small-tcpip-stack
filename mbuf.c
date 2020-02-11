@@ -17,6 +17,7 @@ struct mbuf* mbuf_alloc(int dlen){
     buf->netdev = NULL;
     buf->dlen = dlen;
     buf->data = malloc(dlen);
+    buf->payload = buf->data;
     if(buf->data == NULL){
         fprintf(stderr, "Failed to allocate mbuf data\n");
         free(buf);
