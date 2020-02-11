@@ -9,6 +9,8 @@
 #include "socket_manager.h"
 #include "config.h"
 #include "utils.h"
+#include "mbuf.h"
+#include "eth.h"
 
 struct netdev_info *netdev_head = NULL;
 
@@ -30,12 +32,18 @@ int netdev_init(const char* dev_name){
 
 void *netdev_rx_thread(void *arg){
     int fd = *((int *)arg);
-    uint8_t buf[CONFIG_SOCKET_MANAGER_BUF_SIZE];
     fprintf(stdout, "Starting to recv netdev...\n");
     while(1){
-        int size = dev_tap_read(fd, buf, sizeof(buf));
-        printf("Recv netdev size:%d\n", size);
-        socket_manager_add_raw_packet(buf, size);
+        struct mbuf *buf = mbuf_alloc(CONFIG_SOCKET_MANAGER_BUF_SIZE);
+        if(buf == NULL){
+            fprintf(stderr, "Failed to allocate mbuf\n");
+            return NULL;
+        }
+        int size = dev_tap_read(fd, buf->data, buf->dlen);
+        //printf("Recv netdev size:%d\n", size);
+        eth_rx(buf);
+        socket_manager_add_raw_packet(buf->data, size);
+        mbuf_free_all(buf);
     }
 }
 
@@ -98,6 +106,7 @@ struct netdev_info* netdev_get_by_hw(uint8_t* hw_addr){
         if(memcmp(netdev_now->hw_addr, hw_addr, 6) == 0) return netdev_now;
         netdev_now = netdev_now->next;
     }
+    return NULL;
 }
 
 void netdev_print(struct netdev_info *netdev){

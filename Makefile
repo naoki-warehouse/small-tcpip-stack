@@ -1,7 +1,7 @@
 CC=gcc
 
-sts: sts.c file.o unix_sock.o dev_tap.o utils.o netdev.o my_sock.o socket_manager.o client
-	$(CC) sts.c -o sts file.o unix_sock.o dev_tap.o utils.o netdev.o socket_manager.o -lpthread
+sts: sts.c file.o unix_sock.o dev_tap.o utils.o netdev.o my_sock.o socket_manager.o eth.o mbuf.o client
+	$(CC) sts.c -o sts file.o unix_sock.o dev_tap.o utils.o netdev.o socket_manager.o eth.o mbuf.o -lpthread
 
 client :client.c my_sock.o unix_sock.o
 	$(CC) client.c -o client my_sock.o unix_sock.o
@@ -27,5 +27,11 @@ my_sock.o: my_sock.c
 socket_manager.o: socket_manager.c
 	$(CC) -c socket_manager.c
 
+eth.o: eth.c
+	$(CC) -c eth.c
+
+mbuf.o:mbuf.c
+	$(CC) -c mbuf.c
+
 clean:
-	rm sts file.o unix_sock.o dev_tap.o utils.o netdev.o my_sock.o socket_manager.o
+	rm sts client *.o
