@@ -4,6 +4,7 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "socket_manager.h"
 #include "my_sock.h"

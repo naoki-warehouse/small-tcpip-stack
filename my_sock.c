@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "my_sock.h"
 #include "unix_sock.h"

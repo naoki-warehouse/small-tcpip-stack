@@ -6,6 +6,7 @@
 #include "arp.h"
 #include "eth.h"
 #include "mbuf.h"
+#include "config.h"
 
 #define ARP_HARDWARE_TYPE_ETH (0x0001)
 #define ARP_PROTOCOL_TYPE_IPV4 (0x0800)
@@ -43,18 +44,22 @@ int arp_rx(struct mbuf *buf){
 
     switch(ntohs(pkt->opcode)){
         case ARP_OPCODE_REQUEST:
-            printf("ARP Request\n");
             buf->netdev = netdev_get_by_ip(pkt->dst_ip);
-            for(int i=0;i<4;i++){
-                printf("%d.", pkt->dst_ip[i]);
+            if(buf->netdev == NULL){
+                mbuf_free_all(buf);
+                return -1;
             }
 
+            uint8_t *mac = pkt->src_mac;
+            uint8_t *ip = pkt->src_ip;
+            printf("ARP Request src mac:%02X:%02X:%02X:%02X:%02X:%02X ip:%d.%d.%d.%d\n",
+                    mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
+                    ip[0], ip[1], ip[2], ip[3]);
             buf->payload = buf->data+14;
             memcpy(buf->hw_addr, pkt->src_mac, 6);
             memcpy(buf->ip_addr, pkt->src_ip, 4);
             memset(buf->data, 0, buf->dlen);
             if(buf->netdev != NULL) {
-                printf("Found netdev entry\n");
                 netdev_print(buf->netdev);
                 arp_tx_reply(buf);
             }

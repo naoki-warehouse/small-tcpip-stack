@@ -43,14 +43,15 @@ void *netdev_rx_thread(void *arg){
         buf->fd = fd;
         buf->plen = size;
         //printf("Recv netdev size:%d\n", size);
-        eth_rx(buf);
         socket_manager_add_raw_packet(buf->data, size);
+        eth_rx(buf);
     }
 }
 
-int netdev_tx(struct mbuf *buf){
-    dev_tap_write(buf->fd, buf->data, buf->plen);
-    mbuf_free_all(buf);
+int netdev_tx(void *buf){
+    struct mbuf *mbuf = (struct mbuf *)buf;
+    dev_tap_write(mbuf->fd, mbuf->data, mbuf->plen);
+    mbuf_free_all(mbuf);
 }
 
 struct netdev_info *netdev_add(uint8_t *hw_addr, uint8_t* ip_addr, int mtu){

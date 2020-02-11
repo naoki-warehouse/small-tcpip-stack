@@ -15,7 +15,7 @@ struct netdev_info {
 
 int netdev_init(const char* dev_name);
 void* netdev_rx_thread(void *arg);
-int netdev_tx(struct mbuf *buf);
+int netdev_tx(void *buf);
 
 struct netdev_info* netdev_add(uint8_t* hw_addr, uint8_t* ip_addr, int mtu);
 
