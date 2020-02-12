@@ -6,6 +6,8 @@
 
 #include "arp_table.h"
 #include "arp.h"
+#include "mbuf.h"
+#include "config.h"
 
 #define ARP_TABLE_REFRESH_SEC 10
 struct arp_list {
@@ -32,7 +34,13 @@ void* arp_table_thread(void *arg){
         struct arp_list *entry = arp_table;
         while(entry != NULL){
             if(time_now - entry->entry.update_time > ARP_TABLE_REFRESH_SEC){
+                struct mbuf* buf = mbuf_alloc(CONFIG_SOCKET_MANAGER_BUF_SIZE);
+                struct netdev_info *netdev = netdev_get_head();
+                buf->netdev = netdev; 
+                memcpy(buf->hw_addr, entry->entry.hw, 6);
+                memcpy(buf->ip_addr, entry->entry.ip, 4);
                 fprintf(stdout, "ARP Table Entry Expired\n");
+                arp_tx_request(buf);
             }
             entry = entry->next;
         }

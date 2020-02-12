@@ -17,13 +17,15 @@ struct netdev_info *netdev_head = NULL;
 
 static pthread_t rx_thread;
 
+static int tap_fd;
+
 int netdev_init(const char* dev_name){
-    int tap_fd = dev_tap_open(dev_name);
+    tap_fd = dev_tap_open(dev_name);
     if(tap_fd == -1){
         fprintf(stderr, "Failed to init netdev\n");
         return -1;
     }
-    pthread_create(&rx_thread, NULL, netdev_rx_thread, &tap_fd);
+    pthread_create(&rx_thread, NULL, netdev_rx_thread, NULL);
 
     run_cmd("ip a add 192.168.100.100/24 dev %s", dev_name);
     run_cmd("ip link set dev %s up", dev_name);
@@ -32,7 +34,6 @@ int netdev_init(const char* dev_name){
 }
 
 void *netdev_rx_thread(void *arg){
-    int fd = *((int *)arg);
     fprintf(stdout, "Starting to recv netdev...\n");
     while(1){
         struct mbuf *buf = mbuf_alloc(CONFIG_SOCKET_MANAGER_BUF_SIZE);
@@ -40,8 +41,7 @@ void *netdev_rx_thread(void *arg){
             fprintf(stderr, "Failed to allocate mbuf\n");
             return NULL;
         }
-        int size = dev_tap_read(fd, buf->data, buf->dlen);
-        buf->fd = fd;
+        int size = dev_tap_read(tap_fd, buf->data, buf->dlen);
         buf->plen = size;
         //printf("Recv netdev size:%d\n", size);
         socket_manager_add_raw_packet(buf->data, size);
@@ -51,7 +51,7 @@ void *netdev_rx_thread(void *arg){
 
 int netdev_tx(void *buf){
     struct mbuf *mbuf = (struct mbuf *)buf;
-    dev_tap_write(mbuf->fd, mbuf->data, mbuf->plen);
+    dev_tap_write(tap_fd, mbuf->data, mbuf->plen);
     mbuf_free_all(mbuf);
 }
 
@@ -128,6 +128,10 @@ struct netdev_info* netdev_get_by_hw(uint8_t* hw_addr){
         netdev_now = netdev_now->next;
     }
     return NULL;
+}
+
+struct netdev_info * netdev_get_head(){
+    return netdev_head;
 }
 
 void netdev_print(struct netdev_info *netdev){

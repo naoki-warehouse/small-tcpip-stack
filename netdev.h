@@ -22,6 +22,7 @@ struct netdev_info* netdev_add_s(const char* hw_addr, const char* ip_addr, int m
 
 struct netdev_info* netdev_get_by_ip(uint8_t* ip_addr);
 struct netdev_info* netdev_get_by_hw(uint8_t* hw_addr);
+struct netdev_info* netdev_get_head();
 
 void netdev_list();
 void netdev_print(struct netdev_info* netdev);

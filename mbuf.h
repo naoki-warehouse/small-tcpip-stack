@@ -7,7 +7,6 @@
 struct mbuf {
     struct mbuf *next;
     struct mbuf *pre;
-    int fd;
     struct netdev_info *netdev;
     uint8_t hw_addr[6];
     uint8_t ip_addr[4];

@@ -8,12 +8,6 @@
 #include "mbuf.h"
 #include "netdev.h"
 
-struct eth_pkt {
-    uint8_t dst_mac[6];
-    uint8_t src_mac[6];
-    uint16_t type;
-} __attribute__((packed));
-
 static uint8_t brd_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 int eth_rx(struct mbuf* buf){
