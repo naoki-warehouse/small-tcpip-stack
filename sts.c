@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "config.h"
 #include "socket_manager.h"
+#include "arp.h"
 
 const char* sts_dir = "/tmp/sts/";
 
@@ -91,6 +92,7 @@ int main(int argc, char* argv[]){
     run_cmd("ip a add 192.168.100.100/24 dev test");
 
     socket_manager_init();
+    arp_init();
     netdev_init("tap_sts");
 
     while(1){

@@ -7,6 +7,7 @@
 #include "eth.h"
 #include "mbuf.h"
 #include "config.h"
+#include "arp_table.h"
 
 #define ARP_HARDWARE_TYPE_ETH (0x0001)
 #define ARP_PROTOCOL_TYPE_IPV4 (0x0800)
@@ -31,7 +32,7 @@ struct arp_pkt {
 } __attribute__((packed));
 
 int arp_init(){
-
+    arp_table_init();
 }
 
 int arp_rx(struct mbuf *buf){
@@ -58,6 +59,8 @@ int arp_rx(struct mbuf *buf){
             buf->payload = buf->data+14;
             memcpy(buf->hw_addr, pkt->src_mac, 6);
             memcpy(buf->ip_addr, pkt->src_ip, 4);
+            arp_table_add(pkt->src_mac, pkt->src_ip);
+            arp_table_list();
             memset(buf->data, 0, buf->dlen);
             if(buf->netdev != NULL) {
                 netdev_print(buf->netdev);

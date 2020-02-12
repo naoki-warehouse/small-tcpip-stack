@@ -29,7 +29,7 @@ int socket_manager_init(){
         fprintf(stderr, "Failed to create socket_manager listen_thread\n");
         return -1;
     }
-
+    return 0;
 }
 
 struct rx_thread_arg {
