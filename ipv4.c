@@ -11,6 +11,8 @@
 
 static struct mbuf *buf_base = NULL;
 
+static uint16_t ipv4_pkt_id = 0;
+
 int ipv4_rx(struct mbuf *buf){
     struct ipv4_pkt *pkt = (struct ipv4_pkt *)buf->payload;
     if(pkt->ver != 4){
@@ -49,7 +51,7 @@ int ipv4_tx(struct mbuf *buf){
     pkt->ver = 4;
     pkt->tos = 0;
     pkt->total_len = ntohs(buf->plen-(buf->payload-buf->data));
-    pkt->id = 0xFEFE;
+    pkt->id = ntohs(ipv4_pkt_id);
     pkt->fragment = 0;
     pkt->ttl = 64;
     pkt->protocol = IPV4_PROTOCOL_ICMP;
@@ -58,6 +60,7 @@ int ipv4_tx(struct mbuf *buf){
     memcpy(pkt->dst_ip, buf->ip_addr, 4);
     pkt->chksum = ntohs(ipv4_chksum(buf));
     eth_tx(buf, ETHERNET_TYPE_IP);
+    ipv4_pkt_id++;
 }
 
 uint16_t ipv4_chksum(struct mbuf *buf){
