@@ -5,10 +5,11 @@
 
 #include "eth.h"
 #include "arp.h"
+#include "ipv4.h"
 #include "mbuf.h"
 #include "netdev.h"
 
-static uint8_t brd_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+const static uint8_t brd_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 int eth_rx(struct mbuf* buf){
     if(buf->dlen < sizeof(struct eth_pkt)){
@@ -35,6 +36,7 @@ int eth_rx(struct mbuf* buf){
             arp_rx(buf);
             break;
         case ETHERNET_TYPE_IP:
+            ipv4_rx(buf);
             break;
         default:
             break;

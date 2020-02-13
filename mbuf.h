@@ -5,6 +5,8 @@
 #include "netdev.h"
 
 struct mbuf {
+    struct mbuf *next_pkt;
+    struct mbuf *prev_pkt;
     struct mbuf *next;
     struct mbuf *pre;
     struct netdev_info *netdev;
