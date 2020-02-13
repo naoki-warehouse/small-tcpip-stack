@@ -1,8 +1,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <arpa/inet.h>
+#include <string.h>
 
+#include "eth.h"
 #include "ipv4.h"
+#include "icmp.h"
 #include "mbuf.h"
 
 
@@ -22,10 +25,11 @@ int ipv4_rx(struct mbuf *buf){
     fprintf(stdout, "          TotalLen:%d ID:%04X FragmentFlag:%d TTL:%d\n",
             ntohs(pkt->total_len), ntohs(pkt->id), fragment_flag, pkt->ttl);
     buf->payload = buf->payload + (pkt->header_len*4);
+    memcpy(buf->ip_addr, pkt->src_ip, 4);
 
     switch(pkt->protocol){
         case IPV4_PROTOCOL_ICMP:
-            printf("Recv ICMP\n");
+            icmp_rx(buf);
             break;
         case IPV4_PROTOCOL_UDP:
             printf("Recv UDP\n");
@@ -37,5 +41,35 @@ int ipv4_rx(struct mbuf *buf){
 }
 
 int ipv4_tx(struct mbuf *buf){
+    buf->payload = buf->payload-20;
+    if(buf->payload < buf->data) return -1;
 
+    struct ipv4_pkt *pkt = (struct ipv4_pkt *)buf->payload;
+    pkt->header_len = 5;
+    pkt->ver = 4;
+    pkt->tos = 0;
+    pkt->total_len = ntohs(buf->plen-(buf->payload-buf->data));
+    pkt->id = 0xFEFE;
+    pkt->fragment = 0;
+    pkt->ttl = 64;
+    pkt->protocol = IPV4_PROTOCOL_ICMP;
+    pkt->chksum = 0;
+    memcpy(pkt->src_ip, buf->netdev->ip_addr, 4);
+    memcpy(pkt->dst_ip, buf->ip_addr, 4);
+    pkt->chksum = ntohs(ipv4_chksum(buf));
+    eth_tx(buf, ETHERNET_TYPE_IP);
+}
+
+uint16_t ipv4_chksum(struct mbuf *buf){
+  int len = 5*2;
+  uint8_t *pkt = buf->payload;
+  uint32_t chksum = 0;
+
+  for(int i=0;i<len;i++){
+    chksum += (pkt[i*2] << 8)+pkt[i*2+1];
+    if(chksum > 0xFFFF){
+      chksum = (chksum&0xFFFF)+1;
+    }
+  }
+  return ~chksum&0xFFFF;
 }

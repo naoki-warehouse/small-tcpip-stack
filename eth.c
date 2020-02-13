@@ -30,6 +30,8 @@ int eth_rx(struct mbuf* buf){
             dst[0], dst[1], dst[2], dst[3], dst[4], dst[5],
             src[0], src[1], src[2], src[3], src[4], src[5],
             ntohs(pkt->type));
+    
+    memcpy(buf->hw_addr, pkt->src_mac, 6);
 
     switch(ntohs(pkt->type)){
         case ETHERNET_TYPE_ARP:
@@ -44,6 +46,7 @@ int eth_rx(struct mbuf* buf){
 }
 
 int eth_tx(struct mbuf* buf, uint16_t type){
+    buf->payload = buf->data;
     buf->plen += sizeof(struct eth_pkt);
     struct eth_pkt *pkt = (struct eth_pkt *)buf->payload;
 

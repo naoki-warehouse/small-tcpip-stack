@@ -100,7 +100,6 @@ int arp_tx_reply(struct mbuf *buf){
     memcpy(pkt->dst_ip, buf->ip_addr, 4);
 
     buf->plen = sizeof(struct arp_pkt);
-    buf->payload = buf->data;
     eth_tx(buf, ETHERNET_TYPE_ARP);
 }
 
@@ -119,6 +118,5 @@ int arp_tx_request(struct mbuf *buf){
     memcpy(pkt->dst_ip, buf->ip_addr, 4);
 
     buf->plen = sizeof(struct arp_pkt);
-    buf->payload = buf->data;
     eth_tx(buf, ETHERNET_TYPE_ARP);
 }
